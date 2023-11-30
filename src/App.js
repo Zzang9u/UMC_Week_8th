@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "../src/App.css"
 
 function LoadingModal({ express }) {
   if (!express) {
@@ -8,6 +9,7 @@ function LoadingModal({ express }) {
 
   return (
     <div
+      id="body"
       style={{
         position: "fixed",
         top: 0,
@@ -48,7 +50,7 @@ function App() {
     }
   };
 
-  const handleClick = (e) => {
+  const handleClick = async (e) => {
     if (id === "" || password === "") {
       alert("이벤트가 중단되었습니다.");
       e.preventDefault();
@@ -56,33 +58,26 @@ function App() {
 
     setIsLoading(true);
     
-    const response = axios.post("http://localhost:8000/user/login", {
+    const response = await axios.post("http://localhost:8000/user/login", {
       id: id,
       pw: password,
-    });
-    try {
-      console.log("data");
-      console.log(response.data.id);
-      console.log(response.data.pw);
+      });
 
+    try {
+
+      localStorage.setItem("token", response.data.result.AccessToken);
+
+      console.log("post 요청 성공");
+      console.log(response.data)
+      
     } catch (e) {
-      console.log("error");
+
+      console.log("post 요청 실패");
       console.log(e);
     }finally{
+
+      localStorage.setItem("id", response.data.id);
       setTimeout(() => setIsLoading(false), 1500);
-    }
-
-    const data = response.data;
-
-    if(response.data.id != "umcweb"){
-      data.cod = "401";
-      setId(data);
-      console.log(id);
-    }
-    if(response.data.pw != "1234"){
-      data.cod = "402";
-      setPassword(data);
-      console.log(password);
     }
 
   };
